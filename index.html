@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pengumuman Kelulusan - SDN 4 Banawa</title>
+    
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 untuk Popup Modern -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Canvas Confetti untuk Animasi Lulus -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        /* =========================================
+           VARIABEL WARNA & TEMA (Biru, Putih, Emas)
+           ========================================= */
+        :root {
+            --primary-blue: #0A2647;
+            --secondary-blue: #144272;
+            --light-blue: #2C74B3;
+            --gold: #FFD700;
+            --dark-gold: #DAA520;
+            --white: #FFFFFF;
+            --text-dark: #333333;
+            --bg-light: #F8F9FA;
+        }
+
+        /* =========================================
+           RESET & DASAR
+           ========================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: var(--white);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Watermark Background */
+        .watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60vw;
+            max-width: 600px;
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* =========================================
+           LOADING SCREEN
+           ========================================= */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-blue);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease;
+        }
+
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(255, 215, 0, 0.3);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* =========================================
+           LAYOUT UTAMA
+           ========================================= */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            z-index: 1;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .school-logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 400;
+            margin-bottom: 10px;
+        }
+
+        .badge-year {
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* =========================================
+           KOTAK PENCARIAN (GLASSMORPHISM)
+           ========================================= */
+        .search-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            text-align: center;
+            animation: fadeInUp 1s ease;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-blue);
+            font-size: 20px;
+        }
+
+        #input-nisn {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            background: var(--white);
+            color: var(--text-dark);
+            outline: none;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        #input-nisn:focus {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--gold), var(--dark-gold));
+            color: var(--primary-blue);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-submit:active {
+            transform: translateY(1px);
+        }
+
+        /* =========================================
+           COUNTDOWN TIMER
+           ========================================= */
+        #countdown-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .time-box {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            min-width: 80px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .time-box small {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* =========================================
+           KARTU HASIL KELULUSAN
+           ========================================= */
+        #result-container {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            animation: zoomIn 0.5s ease;
+        }
+
+        .result-card {
+            background: var(--white);
+            color: var(--text-dark);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .result-header {
+            background: var(--light-blue);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--gold);
+        }
+
+        .result-body {
+            padding: 30px;
+        }
+
+        .student-info {
+            margin-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 15px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--secondary-blue);
+        }
+
+        .info-value {
+            font-weight: 700;
+            text-align: right;
+        }
+
+        .status-box {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin: 20px 0;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        /* Efek Glow & Premium untuk LULUS */
+        .status-lulus {
+            background: linear-gradient(45deg, #1e7e34, #28a745);
+            color: var(--white);
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            animation: pulseGlow 2s infinite;
+        }
+
+        .status-gagal {
+            background: linear-gradient(45deg, #bd2130, #dc3545);
+            color: var(--white);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+
+        .message-box {
+            background: var(--bg-light);
+            padding: 15px;
+            border-left: 4px solid var(--primary-blue);
+            border-radius: 5px;
+            font-style: italic;
+            text-align: center;
+            color: #555;
+        }
+
+        .btn-back {
+            display: block;
+            width: 100%;
+            text-align: center;
+            padding: 12px;
+            margin-top: 20px;
+            background: #e9ecef;
+            color: var(--text-dark);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-back:hover {
+            background: #dee2e6;
+        }
+
+        /* =========================================
+           FOOTER
+           ========================================= */
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            backdrop-filter: blur(5px);
+        }
+
+        footer i {
+            color: var(--gold);
+        }
+
+        /* =========================================
+           ANIMASI CSS
+           ========================================= */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 { font-size: 22px; }
+            h2 { font-size: 16px; }
+            .search-box { padding: 20px; }
+            .time-box { min-width: 60px; padding: 10px; }
+            .time-box span { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Watermark Logo -->
+    <img src="https://i.ibb.co.com/pBq2PPqZ/logo-sdn-4.png" alt="Watermark" class="watermark">
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <h3>Memuat Sistem Pengumuman...</h3>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="header-section">
+            <img src="https://i.ibb.co.com/pBq2PPqZ/logo-sdn-4.png" alt="Logo SDN 4 Banawa" class="school-logo">
+            <h2>Pemerintah Kabupaten Donggala</h2>
+            <h1>PENGUMUMAN KELULUSAN SISWA KELAS VI</h1>
+            <h2>SDN 4 BANAWA</h2>
+            <div class="badge-year">Tahun Pelajaran 2025/2026</div>
+        </div>
+
+        <!-- Area Countdown -->
+        <div id="countdown-area">
+            <p style="text-align: center; margin-bottom: 10px;">Pengumuman akan dibuka dalam:</p>
+            <div id="countdown-container">
+                <div class="time-box"><span id="days">00</span><small>Hari</small></div>
+                <div class="time-box"><span id="hours">00</span><small>Jam</small></div>
+                <div class="time-box"><span id="minutes">00</span><small>Menit</small></div>
+                <div class="time-box"><span id="seconds">00</span><small>Detik</small></div>
+            </div>
+        </div>
+
+        <!-- Area Pencarian (Akan disembunyikan saat countdown belum selesai) -->
+        <div class="search-box" id="search-area" style="display: none;">
+            <p style="margin-bottom: 20px; font-weight: 300;">Silakan masukkan 10 digit NISN Anda untuk melihat hasil kelulusan.</p>
+            <div class="input-group">
+                <i class="fas fa-id-card"></i>
+                <input type="text" id="input-nisn" inputmode="numeric" placeholder="Contoh: 0123456789" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
+            </div>
+            <button class="btn-submit" onclick="cekKelulusan()">
+                <i class="fas fa-search"></i> Cek Kelulusan
+            </button>
+        </div>
+
+        <!-- Area Hasil Kelulusan -->
+        <div id="result-container">
+            <div class="result-card">
+                <div class="result-header">
+                    <h3>KARTU HASIL KELULUSAN</h3>
+                </div>
+                <div class="result-body">
+                    <div class="student-info">
+                        <div class="info-row">
+                            <span class="info-label">Nama Lengkap</span>
+                            <span class="info-value" id="res-nama">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">NISN</span>
+                            <span class="info-value" id="res-nisn">-</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Kelas</span>
+                            <span class="info-value" id="res-kelas">-</span>
+                        </div>
+                    </div>
+                    
+                    <div id="res-status" class="status-box">
+                        STATUS
+                    </div>
+
+                    <div class="message-box" id="res-pesan">
+                        Pesan dari sekolah akan tampil di sini.
+                    </div>
+
+                    <button class="btn-back" onclick="resetPencarian()">
+                        <i class="fas fa-arrow-left"></i> Kembali Cek NISN Lain
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Dikreasikan oleh Zulkifli, M.Pd - SDN 4 Banawa &copy; <span id="currentYear"></span></p>
+    </footer>
+
+    <!-- Script Utama -->
+    <script>
+        /* =========================================
+           1. PENGATURAN DATA SISWA (MUDAH DIEDIT GURU)
+           ========================================= 
+           Panduan Mengedit:
+           - Tambahkan data di dalam kurung siku [ ... ]
+           - Format: { nisn: "10 digit angka", nama: "Nama Siswa", kelas: "Nama Kelas", status: "LULUS" atau "TIDAK LULUS", pesan: "Pesan motivasi" }
+           - Pastikan NISN ditulis menggunakan tanda kutip "" agar angka 0 di depan tidak hilang.
+           - Jangan lupa tanda koma (,) di akhir setiap baris data kecuali yang terakhir.
+        */
+        const dataSiswa = [
+            { nisn: "0136230536", nama: "ABDU ROYAN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0145301086", nama: "ADELIA FARAHNISA MARZUKIE", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0137745041", nama: "AFIQA NURUL FATIHA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0148225926", nama: "AISYAH HUMAIRAH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0144320795", nama: "ANDI MUSU HIDAYATULLAH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0141118222", nama: "ARIF DARMAWAN. S", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0148841224", nama: "ATTAYA AHMAD RABBANI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0135204079", nama: "FRITDZILYA VENSIMA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0143836477", nama: "GENTZA AL RAYYAN MAMONTO", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3133765886", nama: "GILANG PUSAKA QINAYUNGAN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0144039549", nama: "HAFIZHA AMALIA WAHYU", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0143518336", nama: "HAIKAL RAMADHAN N", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0133259157", nama: "LEONAL EMMANUEL", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3135635350", nama: "MISFA AINY SYABILLAH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0146500315", nama: "MOH HAIQQAL ANUGRAH", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0113632989", nama: "MOH. AHRAM", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0142012781", nama: "MOH. GAZA RAMADHAN", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0132409137", nama: "PELANGI AYUDIA KINARA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0139667875", nama: "REFALINAYA NABILA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0138609905", nama: "RICHIE OWEN LIWANG", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0149753391", nama: "RIRIN APRILYA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3148318695", nama: "SALAHUDIN FATIH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3138920077", nama: "SANG AYU MADE ARI ASTHITI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0139801295", nama: "SYIFA NATASYA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0138237684", nama: "ZAYYINAH ADELIA NURIN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0132881071", nama: "ADBIZAR SYAFA'AT", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0141193141", nama: "ALIKHA NAYLA SASIKIRANA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0142014119", nama: "AMIRAH QURRATU'AIN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3147571715", nama: "ANDI MIRZA UKAIL H", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0139989118", nama: "ANDI NUR PUTRI HUNAIRAH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0138320783", nama: "AQILA RAMADHANI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0137434243", nama: "ATIKA ZAHIRA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0133209959", nama: "ATIKA ZAHRA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0132081859", nama: "BUMI ELNINO SIDDIQ", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0148201089", nama: "FAUZIAH OKTAVIANI RAHMAN", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0134960836", nama: "MOH ABIDZAR AL GHIFARI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3132357320", nama: "MOH. AZAM", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0137280050", nama: "MOH. RHEVAN", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0149936707", nama: "MOHAMMAD FAHRUL RAMADHAN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0147499453", nama: "MUH. RASYA AL-DAFA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3148527549", nama: "MUH. SYAFI ASSAYAUQI RIZKI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3135614481", nama: "MUHAMMAD DAULID FAIRUN", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0133693816", nama: "MUHAMMAD MULTALZAM", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0122935855", nama: "MUHAMMAD NIZAM", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "3147958644", nama: "Muhammad Syahriel Farest", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "3133116419", nama: "NAJWA", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0138279042", nama: "RIDYA NOVA AULIA", kelas: "VI", status: "TIDAK LULUS", pesan: "Jangan patah semangat. Silakan hubungi wali kelas." },
+            { nisn: "0138484967", nama: "SAKINAH", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "0146890597", nama: "THALIA PUTRI RAMADHANI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." },
+            { nisn: "149102853", nama: "TITI CAHYANINGSI JANUARTI", kelas: "VI", status: "LULUS", pesan: "Selamat! Teruslah berprestasi di jenjang SMP." }
+        ];
+
+        /* =========================================
+           2. PENGATURAN WAKTU PENGUMUMAN (COUNTDOWN)
+           ========================================= 
+           Ubah tanggal dan waktu di bawah ini.
+           Format: "Tahun-Bulan-TanggalTJam:Menit:Detik" (Gunakan huruf T di tengah)
+        */
+        // Waktu pengumuman dibuka (Contoh: 15 Juni 2026 jam 10 pagi)
+        const waktuPengumuman = new Date("2026-06-15T10:00:00").getTime();
+        
+        // PENTING UNTUK TESTING GURU: 
+        // Ubah isTestingMode menjadi 'true' jika ingin melewati waktu countdown (langsung bisa tes masuk NISN).
+        // Ubah menjadi 'false' jika website sudah siap dibagikan ke siswa.
+        const isTestingMode = true; 
+
+
+        /* =========================================
+           3. SISTEM AUDIO OFFLINE (Web Audio API)
+           ========================================= 
+           Menggunakan synthesizer bawaan browser agar suara selalu menyala 
+           tanpa bergantung pada link file MP3 di internet.
+        */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTone(freq, type, duration, vol=0.1) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playClickSound() {
+            playTone(600, 'sine', 0.1, 0.1);
+        }
+
+        function playErrorSound() {
+            playTone(200, 'sawtooth', 0.4, 0.1);
+            setTimeout(() => playTone(150, 'sawtooth', 0.4, 0.1), 200);
+        }
+
+        function playSuccessSound() {
+            // Nada bahagia (C mayor arpeggio)
+            playTone(523.25, 'sine', 0.3, 0.1); // C5
+            setTimeout(() => playTone(659.25, 'sine', 0.3, 0.1), 100); // E5
+            setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); // G5
+            setTimeout(() => playTone(1046.50, 'sine', 0.6, 0.1), 300); // C6
+        }
+
+        function playApplause() {
+            // Simulasi suara tepuk tangan / keramaian bahagia menggunakan noise
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const bufferSize = audioCtx.sampleRate * 2; // 2 detik
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            
+            // Filter agar tidak terlalu bising
+            const bandpass = audioCtx.createBiquadFilter();
+            bandpass.type = 'bandpass';
+            bandpass.frequency.value = 1000;
+
+            const gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+
+            noise.connect(bandpass);
+            bandpass.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            noise.start();
+        }
+
+
+        /* =========================================
+           4. LOGIKA WEBSITE (COUNTDOWN, CEK NISN, UI)
+           ========================================= */
+
+        // Set tahun di footer
+        document.getElementById('currentYear').innerText = new Date().getFullYear();
+
+        // Hilangkan loading screen setelah halaman dimuat
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loading = document.getElementById('loading-screen');
+                loading.style.opacity = '0';
+                setTimeout(() => loading.style.display = 'none', 800);
+            }, 1000);
+            mulaiCountdown();
+        });
+
+        // Fungsi Countdown
+        function mulaiCountdown() {
+            const x = setInterval(function() {
+                const sekarang = new Date().getTime();
+                const selisih = waktuPengumuman - sekarang;
+
+                if (selisih > 0 && !isTestingMode) {
+                    // Hitung waktu
+                    const hari = Math.floor(selisih / (1000 * 60 * 60 * 24));
+                    const jam = Math.floor((selisih % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const menit = Math.floor((selisih % (1000 * 60 * 60)) / (1000 * 60));
+                    const detik = Math.floor((selisih % (1000 * 60)) / 1000);
+
+                    // Tampilkan ke UI
+                    document.getElementById("days").innerText = hari.toString().padStart(2, '0');
+                    document.getElementById("hours").innerText = jam.toString().padStart(2, '0');
+                    document.getElementById("minutes").innerText = menit.toString().padStart(2, '0');
+                    document.getElementById("seconds").innerText = detik.toString().padStart(2, '0');
+                } else {
+                    // Waktu habis atau mode testing aktif
+                    clearInterval(x);
+                    document.getElementById("countdown-area").style.display = "none";
+                    document.getElementById("search-area").style.display = "block";
+                }
+            }, 1000);
+        }
+
+        // Fungsi Cek Kelulusan
+        function cekKelulusan() {
+            playClickSound(); // Mainkan suara klik tombol
+
+            const inputNISN = document.getElementById("input-nisn").value;
+
+            // Validasi Input
+            if (inputNISN === "") {
+                playErrorSound();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Oops...',
+                    text: 'NISN tidak boleh kosong!',
+                    confirmButtonColor: '#0A2647'
+                });
+                return;
+            }
+
+            if (inputNISN.length < 9 || inputNISN.length > 10 || !/^\d+$/.test(inputNISN)) {
+                playErrorSound();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Format Salah',
+                    text: 'NISN harus berisi 9-10 digit angka!',
+                    confirmButtonColor: '#0A2647'
+                });
+                return;
+            }
+
+            // Cari Data Siswa di Array
+            const hasilCari = dataSiswa.find(siswa => siswa.nisn === inputNISN);
+
+            if (hasilCari) {
+                tampilkanHasil(hasilCari);
+            } else {
+                playErrorSound();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Tidak Ditemukan',
+                    text: 'NISN tidak ditemukan, silakan periksa kembali.',
+                    confirmButtonColor: '#0A2647'
+                });
+            }
+        }
+
+        // Tangkap tombol Enter pada input form
+        document.getElementById("input-nisn").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                cekKelulusan();
+            }
+        });
+
+        // Fungsi Menampilkan Kartu Hasil
+        function tampilkanHasil(data) {
+            // Sembunyikan pencarian, tampilkan hasil
+            document.getElementById("search-area").style.display = "none";
+            const resultContainer = document.getElementById("result-container");
+            resultContainer.style.display = "block";
+            
+            // Isi Data ke Kartu
+            document.getElementById("res-nama").innerText = data.nama;
+            document.getElementById("res-nisn").innerText = data.nisn;
+            document.getElementById("res-kelas").innerText = data.kelas;
+            document.getElementById("res-pesan").innerText = `"${data.pesan}"`;
+
+            const statusBox = document.getElementById("res-status");
+            statusBox.innerText = data.status;
+
+            // Reset class status
+            statusBox.className = "status-box"; 
+
+            if (data.status.toUpperCase() === "LULUS") {
+                statusBox.classList.add("status-lulus");
+                
+                // Mainkan suara sukses & tepuk tangan
+                playSuccessSound();
+                setTimeout(playApplause, 500);
+
+                // Tembakkan Confetti
+                fireConfetti();
+
+                // Munculkan Popup SweetAlert Premium
+                setTimeout(() => {
+                    Swal.fire({
+                        title: 'SELAMAT LULUS!',
+                        text: 'Selamat dan sukses untuk masa depanmu!',
+                        icon: 'success',
+                        confirmButtonText: 'Terima Kasih',
+                        confirmButtonColor: '#28a745',
+                        backdrop: `rgba(0,0,123,0.4)`
+                    });
+                }, 1000);
+
+            } else {
+                statusBox.classList.add("status-gagal");
+                playErrorSound();
+            }
+        }
+
+        // Fungsi Reset untuk Mengecek NISN Lain
+        function resetPencarian() {
+            playClickSound();
+            document.getElementById("result-container").style.display = "none";
+            document.getElementById("input-nisn").value = "";
+            document.getElementById("search-area").style.display = "block";
+            document.getElementById("input-nisn").focus();
+        }
+
+        // Fungsi Animasi Confetti
+        function fireConfetti() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+    </script>
+</body>
+</html>
